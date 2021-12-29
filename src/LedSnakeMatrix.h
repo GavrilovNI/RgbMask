@@ -6,19 +6,19 @@
 class LedSnakeMatrix : public LedStrip
 {
     private:
-        uint16_t _width, _length;
+        uint16_t _width, _height;
 
     public:
-        LedSnakeMatrix(uint16_t width, uint16_t length, int16_t pin = 6, neoPixelType type = NEO_GRB + NEO_KHZ800)
-            : LedStrip(width * length, pin, type)
+        LedSnakeMatrix(uint16_t width, uint16_t height, int16_t pin = 6, neoPixelType type = NEO_GRB + NEO_KHZ800)
+            : LedStrip(width * height, pin, type)
         {
             _width = width;
-            _length = length;
+            _height = height;
         }
 
         virtual LedPixel getPixel(uint16_t x, uint16_t y) {
             
-            uint16_t index = y * _width + (y % 2 == 0 ? x : _width - x - 1);
+            uint16_t index = x * _height + (x % 2 == 0 ? y : _height - y - 1);
             return LedStrip::getPixel(index);
         }
 
@@ -27,8 +27,8 @@ class LedSnakeMatrix : public LedStrip
             return _width;
         }
 
-        uint16_t getLength()
+        uint16_t getHeight()
         {
-            return _length;
+            return _height;
         }
 };

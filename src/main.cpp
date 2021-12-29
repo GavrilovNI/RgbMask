@@ -6,8 +6,10 @@
 #include <Stream.h>
 #include "LedSnakeMatrix.h"
 #include "WifiManager.h"
+#include "animations/Rainbow45.h"
+#include "animations/Snake.h"
 
-LedSnakeMatrix matrix(8, 32, 2, NEO_GRB + NEO_KHZ800);
+LedSnakeMatrix matrix(32, 8, 2, NEO_GRB + NEO_KHZ800);
 WifiManager wifi;
 
 WebServer server(80);
@@ -93,7 +95,14 @@ void setup() {
   setupSd();
 
   loadWifiSettings();
+
+  matrix.setBrightness(30);
 }
+
+//Rainbow45 anim(25);
+Snake anim(8*32, ColorRGB(0, 0, 255));
+float speed = 8.0f;
+unsigned long lastMillis; 
 
 void loop() {
 
@@ -134,7 +143,15 @@ void loop() {
   if(serverWorking)
     server.handleClient();
 
-  delay(100);
+  anim.Apply(matrix);
+  matrix.show();
+
+  unsigned long currMillis = millis();
+  unsigned long delta = currMillis - lastMillis;
+  lastMillis = currMillis;
+  
+  anim.MoveFrame(speed * delta / 1000);
+  delay(10);
 }
 
 String getArgOrDefault(String argName, String defaultValue)

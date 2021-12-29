@@ -4,6 +4,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <vector>
 #include "LedStrip.h"
+#include "colors/ColorRGB.h"
 
 class LedPixel
 {
@@ -32,13 +33,17 @@ class LedPixel
             setColor(bytes[0], bytes[1], bytes[2]);
         }
 
-        uint32_t getColor() const
+        ColorRGB getColor() const
         {
             uint8_t r = _pixel[_rOffset];
             uint8_t g = _pixel[_gOffset];
             uint8_t b = _pixel[_rOffset];
-            uint32_t color = (((uint32_t)r) << 16) + (((uint32_t)g) << 8) + b;
-            return color;
+            return ColorRGB(r, g, b);
+        }
+
+        void setColor(const ColorRGB& color)
+        {
+            setColor(color.r, color.g, color.b);
         }
 
         void setColor(uint32_t color)
