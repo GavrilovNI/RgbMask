@@ -16,10 +16,10 @@ class LedSnakeMatrix : public LedStrip
             _length = length;
         }
 
-        virtual LedPixel GetPixel(uint16_t x, uint16_t y) {
+        virtual LedPixel getPixel(uint16_t x, uint16_t y) {
             
             uint16_t index = y * _width + (y % 2 == 0 ? x : _width - x - 1);
-            return LedStrip::GetPixel(index);
+            return LedStrip::getPixel(index);
         }
 
         uint16_t getWidth()

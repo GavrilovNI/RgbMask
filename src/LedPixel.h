@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <Adafruit_NeoPixel.h>
+#include <vector>
 #include "LedStrip.h"
 
 class LedPixel
@@ -21,7 +22,17 @@ class LedPixel
 
         }
 
-        uint32_t GetColor()
+        std::vector<uint8_t> toBytes() const
+        {
+            return std::vector<uint8_t> { _pixel[_rOffset], _pixel[_gOffset], _pixel[_bOffset] };
+        }
+
+        void fromBytes(uint8_t* bytes)
+        {
+            setColor(bytes[0], bytes[1], bytes[2]);
+        }
+
+        uint32_t getColor() const
         {
             uint8_t r = _pixel[_rOffset];
             uint8_t g = _pixel[_gOffset];
@@ -30,24 +41,24 @@ class LedPixel
             return color;
         }
 
-        void SetColor(uint32_t color)
+        void setColor(uint32_t color)
         {
             uint8_t r = (uint8_t)(color >> 16);
             uint8_t g = (uint8_t)(color >> 8);
             uint8_t b = (uint8_t)(color);
-            SetColor(r, g, b);
+            setColor(r, g, b);
         }
 
-        void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t w)
+        void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t w)
         {
             if (_brightness) { // See notes in setBrightness()
                 w = (w * _brightness) >> 8;
             }
-            SetColor(r, g, b);
+            setColor(r, g, b);
             _pixel[_wOffset] = w;
         }
 
-        void SetColor(uint8_t r, uint8_t g, uint8_t b)
+        void setColor(uint8_t r, uint8_t g, uint8_t b)
         {
             if (_brightness) { // See notes in setBrightness()
                 r = (r * _brightness) >> 8;

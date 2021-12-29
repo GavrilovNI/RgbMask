@@ -5,17 +5,10 @@
 
 class WifiManager
 {
-private:
-    String lastWifiName;
-    String lastWifiPassword;
-
 public:
     
     void connect(String name, String password, unsigned long timeout = 5000)
     {
-        lastWifiName = name;
-        lastWifiPassword = password;
-
         WiFi.mode(WIFI_STA);
         WiFi.begin(name.c_str(), password.c_str());
 
@@ -28,10 +21,6 @@ public:
             delay(100);
         }
         while(isConnected() == false && timePast < timeout);
-    }
-
-    void reconnect(unsigned long timeout = 5000) {
-        connect(lastWifiName, lastWifiPassword, timeout);
     }
 
     bool setUpAccessPoint(String name, String password = "")

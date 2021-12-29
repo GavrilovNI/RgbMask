@@ -1,5 +1,9 @@
 #include <Arduino.h>
 #include <WebServer.h>
+#include <FS.h>
+#include <SD.h>
+#include <SPI.h>
+#include <Stream.h>
 #include "LedSnakeMatrix.h"
 #include "WifiManager.h"
 
@@ -27,6 +31,54 @@ void closeServer()
   serverWorking = false;
 }
 
+void setupSd() {
+  if(!SD.begin(5)){
+    Serial.println("Card Mount Failed");
+    return;
+  }
+  uint8_t cardType = SD.cardType();
+
+  if(cardType == CARD_NONE){
+    Serial.println("No SD card attached");
+    return;
+  }
+}
+
+const String wifiFilePath = "/wifi.txt";
+
+String wifiName, wifiPassword;
+
+String readLine(Stream& stream)
+{
+  String result = stream.readStringUntil('\r');
+  stream.readStringUntil('\n');
+  return result;
+}
+
+bool loadWifiSettings()
+{
+  File wifiSettingsFile = SD.open(wifiFilePath);
+  if(wifiSettingsFile)
+  {
+    wifiName = readLine(wifiSettingsFile);
+    wifiPassword = readLine(wifiSettingsFile);
+    wifiSettingsFile.close();
+    return true;
+  }
+  return false;
+}
+
+void saveWifiSettings()
+{
+  File wifiSettingsFile = SD.open(wifiFilePath, FILE_WRITE);
+  if(wifiName != "")
+  {
+    wifiSettingsFile.println(wifiName.c_str());
+    wifiSettingsFile.println(wifiPassword.c_str());
+    wifiSettingsFile.close();
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   matrix.begin();
@@ -35,16 +87,13 @@ void setup() {
   server.on("/setcolor", onSetColor);
   server.on("/connect", onConnect);
 
-
   matrix.clear();
   matrix.show();
 
-  wifi.setUpAccessPoint("LedMask");
-  Serial.println(wifi.getAccessPointIp());
-  beginServer();
-}
+  setupSd();
 
-String wifiName, wifiPassword;
+  loadWifiSettings();
+}
 
 void loop() {
 
@@ -52,18 +101,30 @@ void loop() {
   {
     if(wifi.isConnected() == false)
     {
-      if(serverWorking) {
+      if(serverWorking)
+      {
         closeServer();
       }
-      wifi.connect(wifiName, wifiPassword);
+
+      if(wifiName != "")
+      {
+        Serial.println(String("Connecting to '" + wifiName + "'"));
+        wifi.connect(wifiName, wifiPassword);
+      }
 
       if(wifi.isConnected() == false)
       {
-        wifi.setUpAccessPoint("LedMask");
+        Serial.println("Failed to  connect.");
+
+        String accessPointName = "LedMask";
+        wifi.setUpAccessPoint(accessPointName);
+        Serial.println(String("Access point started '" + accessPointName + "'"));
         Serial.println(wifi.getAccessPointIp());
+        saveWifiSettings();
       }
       else
       {
+        Serial.println("Connected!");
         Serial.println(wifi.getLocalIp());
       }
       beginServer();
@@ -108,7 +169,7 @@ void onSetColor()
 
   if(x >= 0 && y >= 0)
   {
-    matrix.GetPixel(x, y).SetColor(r, g, b);
+    matrix.getPixel(x, y).setColor(r, g, b);
     matrix.show();
     server.send(200, "text/plain", "done");  
   }
