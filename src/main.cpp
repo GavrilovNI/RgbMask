@@ -10,12 +10,10 @@
 #include "animations/Rainbow45.h"
 #include "animations/Snake.h"
 #include "led/LedMatrixSet.h"
+#include "utils/ContainerConventer.h"
+#include "led/adafruit/AdafruitLedStripContainer.h"
 
-LedMatrix *matrix;
-AdafruitLedSnakeMatrix *matrix1 = new AdafruitLedSnakeMatrix(7, 13, 2, NEO_GRB + NEO_KHZ800);
-AdafruitLedSnakeMatrix* matrix2 = new AdafruitLedSnakeMatrix(7, 13, 4, NEO_GRB + NEO_KHZ800);
-
-std::vector<LedMatrix*> matrixes;
+AdafruitLedStripContainer<AdafruitLedSnakeMatrix> matrixes;
 
 LedMatrixSet* matrixSet;
 
@@ -93,30 +91,25 @@ void saveWifiSettings()
 
 void setup() {
 
-  matrixes.push_back(matrix1);
-  matrixes.push_back(matrix2);
-  matrixSet = new LedMatrixSet(matrixes, LedMatrixSet::Right);
-  matrix = (LedMatrix*)matrixSet;
+  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 2, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 4, NEO_GRB + NEO_KHZ800));
+  matrixSet = new LedMatrixSet(container_cast(matrixes.strips), LedMatrixSet::Right);
 
   Serial.begin(9600);
-  matrix1->begin();
-  matrix2->begin();
   
   server.on("/", onHome);
   server.on("/setcolor", onSetColor);
   server.on("/connect", onConnect);
 
-  matrix1->LedStrip::clear();
-  matrix2->LedStrip::clear();
-  matrix1->show();
-  matrix2->show();
+  matrixes.begin();
+  matrixes.clear();
+  matrixes.show();
+  matrixes.setBrightness(30);
 
   setupSd();
 
   loadWifiSettings();
 
-  matrix1->setBrightness(30);
-  matrix2->setBrightness(30);
 }
 
 Rainbow45 anim(25);
@@ -163,9 +156,8 @@ void loop() {
   if(serverWorking)
     server.handleClient();
 
-  anim.Apply(*matrix);
-  matrix1->show();
-  matrix2->show();
+  anim.Apply(*matrixSet);
+  matrixes.show();
 
   unsigned long currMillis = millis();
   unsigned long delta = currMillis - lastMillis;
@@ -207,8 +199,8 @@ void onSetColor()
 
   if(x >= 0 && y >= 0)
   {
-    matrix1->getPixel(x, y)->setColor(ColorRGB(r, g, b));
-    matrix1->show();
+    matrixSet->getPixel(x, y)->setColor(ColorRGB(r, g, b));
+    matrixes.show();
     server.send(200, "text/plain", "done");  
   }
   else

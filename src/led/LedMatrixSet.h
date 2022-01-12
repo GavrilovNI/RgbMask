@@ -6,7 +6,7 @@
 
 
 
-class LedMatrixSet : public LedMatrix, public Adafruit_NeoPixel
+class LedMatrixSet : public LedMatrix
 {
     public:
     enum Direction
@@ -58,28 +58,18 @@ class LedMatrixSet : public LedMatrix, public Adafruit_NeoPixel
                 if(_direction == Direction::Right)
                 {
                     uint16_t currMatrixWidth = currMatrix->getWidth();
-                    if(x >= currMatrixWidth)
-                    {
-                        x -= currMatrixWidth;
-                        continue;
-                    }
-                    else
-                    {
+                    if(x < currMatrixWidth)
                         return currMatrix->getPixel(x, y);
-                    }
+                    else
+                        x -= currMatrixWidth;
                 }
                 else if(_direction == Direction::Down)
                 {
                     uint16_t currMatrixHeight = currMatrix->getHeight();
-                    if(y >= currMatrixHeight)
-                    {
-                        y -= currMatrixHeight;
-                        continue;
-                    }
-                    else
-                    {
+                    if(y < currMatrixHeight)
                         return currMatrix->getPixel(x, y);
-                    }
+                    else
+                        y -= currMatrixHeight;
                 }
             }
 
@@ -88,6 +78,23 @@ class LedMatrixSet : public LedMatrix, public Adafruit_NeoPixel
 
         virtual std::shared_ptr<LedPixel> getPixel(uint16_t index) const override
         {
-            return nullptr;
+            /*for(int i = 0; i < _matrixes.size(); i++)
+            {
+                LedMatrix* currMatrix = _matrixes[i];
+                uint16_t currMatrixLength = currMatrix->getLength();
+                if(index < currMatrixLength)
+                {
+                    return currMatrix->LedStrip::getPixel(index);
+                }
+                else
+                {
+                    index -= currMatrixLength;
+                }
+            }
+
+            return nullptr;*/
+            throw "not implemented";
         }
+
+        
 };
