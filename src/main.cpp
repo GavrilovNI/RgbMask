@@ -4,12 +4,12 @@
 #include <SD.h>
 #include <SPI.h>
 #include <Stream.h>
-#include "LedSnakeMatrix.h"
 #include "WifiManager.h"
+#include "led/adafruit/AdafruitLedSnakeMatrix.h"
 #include "animations/Rainbow45.h"
 #include "animations/Snake.h"
 
-LedSnakeMatrix matrix(32, 8, 2, NEO_GRB + NEO_KHZ800);
+AdafruitLedSnakeMatrix matrix(7, 13, 2, NEO_GRB + NEO_KHZ800);
 WifiManager wifi;
 
 WebServer server(80);
@@ -96,11 +96,11 @@ void setup() {
 
   loadWifiSettings();
 
-  matrix.setBrightness(30);
+  matrix.setBrightness(100);
 }
 
-//Rainbow45 anim(25);
-Snake anim(8*32, ColorRGB(0, 0, 255));
+Rainbow45 anim(25);
+//Snake anim(8*32, ColorRGB(0, 0, 255));
 float speed = 8.0f;
 unsigned long lastMillis; 
 

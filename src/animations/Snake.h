@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cmath>
-#include "Animation.h"
+#include "MatrixAnimation.h"
 #include "colors/ColorRGB.h"
 #include "colors/ColorHSV.h"
 
-class Snake : public Animation
+class Snake : public MatrixAnimation
 {
 private:
     float _maxLength;
@@ -28,7 +28,7 @@ public:
     }
 
 
-    virtual void Apply(LedSnakeMatrix& matrix)
+    virtual void Apply(LedMatrix& matrix) const
     {
         matrix.clear();
         int i;
@@ -38,7 +38,7 @@ public:
             uint8_t y = i % matrix.getHeight();
             if(x % 2 == 1)
                 y = matrix.getHeight() - y - 1;
-            matrix.getPixel(x, y).setColor(_color);
+            matrix.getPixel(x, y)->setColor(_color);
         }
         if(i < matrix.getWidth() * matrix.getHeight() && i < _maxLength)
         {
@@ -50,7 +50,7 @@ public:
 
             ColorHSV color = _color.toHSV();
             color.setV(lastPixelBrightness);
-            matrix.getPixel(x, y).setColor(color.toRGB());
+            matrix.getPixel(x, y)->setColor(color.toRGB());
         }
         
     }

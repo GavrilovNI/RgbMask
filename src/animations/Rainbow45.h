@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cmath>
-#include "Animation.h"
+#include "MatrixAnimation.h"
 #include "colors/ColorHSV.h"
 
-class Rainbow45 : public Animation
+class Rainbow45 : public MatrixAnimation
 {
 private:
     uint32_t _height;
@@ -25,7 +25,7 @@ public:
     }
 
 
-    virtual void Apply(LedSnakeMatrix& matrix)
+    virtual void Apply(LedMatrix& matrix) const
     {
         float step = 360.0f / _height;
         float h = _pos * step;
@@ -38,7 +38,7 @@ public:
                 int realX = x - y;
                 if(realX >= matrix.getWidth())
                     continue;
-                matrix.getPixel(realX, y).setColor(color.toRGB());
+                matrix.getPixel(realX, y)->setColor(color);
             }
 
             h += step;
