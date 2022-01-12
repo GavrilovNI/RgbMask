@@ -4,17 +4,27 @@
 #include <SD.h>
 #include <SPI.h>
 #include <Stream.h>
+#include <vector>
 #include "WifiManager.h"
 #include "led/adafruit/AdafruitLedSnakeMatrix.h"
 #include "animations/Rainbow45.h"
 #include "animations/Snake.h"
+#include "led/LedMatrixSet.h"
 
-AdafruitLedSnakeMatrix matrix(7, 13, 2, NEO_GRB + NEO_KHZ800);
+LedMatrix *matrix;
+AdafruitLedSnakeMatrix *matrix1 = new AdafruitLedSnakeMatrix(7, 13, 2, NEO_GRB + NEO_KHZ800);
+AdafruitLedSnakeMatrix* matrix2 = new AdafruitLedSnakeMatrix(7, 13, 4, NEO_GRB + NEO_KHZ800);
+
+std::vector<LedMatrix*> matrixes;
+
+LedMatrixSet* matrixSet;
+
+
 WifiManager wifi;
 
 WebServer server(80);
 bool serverWorking = false;
-
+ 
 void onSetColor();
 void onConnect();
 void onHome() {
@@ -82,21 +92,31 @@ void saveWifiSettings()
 }
 
 void setup() {
+
+  matrixes.push_back(matrix1);
+  matrixes.push_back(matrix2);
+  matrixSet = new LedMatrixSet(matrixes, LedMatrixSet::Right);
+  matrix = (LedMatrix*)matrixSet;
+
   Serial.begin(9600);
-  matrix.begin();
+  matrix1->begin();
+  matrix2->begin();
   
   server.on("/", onHome);
   server.on("/setcolor", onSetColor);
   server.on("/connect", onConnect);
 
-  matrix.clear();
-  matrix.show();
+  matrix1->LedStrip::clear();
+  matrix2->LedStrip::clear();
+  matrix1->show();
+  matrix2->show();
 
   setupSd();
 
   loadWifiSettings();
 
-  matrix.setBrightness(100);
+  matrix1->setBrightness(30);
+  matrix2->setBrightness(30);
 }
 
 Rainbow45 anim(25);
@@ -143,8 +163,9 @@ void loop() {
   if(serverWorking)
     server.handleClient();
 
-  anim.Apply(matrix);
-  matrix.show();
+  anim.Apply(*matrix);
+  matrix1->show();
+  matrix2->show();
 
   unsigned long currMillis = millis();
   unsigned long delta = currMillis - lastMillis;
@@ -186,8 +207,8 @@ void onSetColor()
 
   if(x >= 0 && y >= 0)
   {
-    matrix.getPixel(x, y).setColor(r, g, b);
-    matrix.show();
+    matrix1->getPixel(x, y)->setColor(ColorRGB(r, g, b));
+    matrix1->show();
     server.send(200, "text/plain", "done");  
   }
   else

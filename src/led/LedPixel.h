@@ -8,11 +8,7 @@
 class LedPixel
 {
     public:
-        LedPixel()
-        {
-
-        }
-
+    
         virtual std::vector<uint8_t> toBytes() const = 0;
         virtual void fromBytes(uint8_t* bytes) = 0;
 

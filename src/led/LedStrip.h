@@ -11,45 +11,16 @@ class LedStrip
         uint16_t _pixelsCount;
 
     public:
-        LedStrip(uint16_t pixelsCount)
-        {
-            _pixelsCount = pixelsCount;
-        }
+        LedStrip(uint16_t pixelsCount);
 
-        uint16_t getLength() const
-        {
-            return _pixelsCount;
-        }
+        uint16_t getLength() const;
 
         virtual std::shared_ptr<LedPixel> getPixel(uint16_t index) const = 0;
 
-        void clear()
-        {
-            for(int i = 0; i < getLength(); i++)
-            {
-                getPixel(i)->clear();
-            }
-        }
+        void clear();
 
-        std::vector<uint8_t> toBytes() const
-        {
-            std::vector<uint8_t> result;
-            uint16_t pixelsCount = getLength();
-            for(int i = 0; i < pixelsCount; i++)
-            {
-                std::vector<uint8_t> pixelBytes = getPixel(i)->toBytes();
-                result.insert(result.end(), pixelBytes.begin(), pixelBytes.end());
-            }
-            return result;
-        }
+        std::vector<uint8_t> toBytes() const;
 
-        void fromBytes(uint8_t* bytes)
-        {
-            uint16_t pixelsCount = getLength();
-            for(int i = 0; i < pixelsCount; i++)
-            {
-                getPixel(i)->fromBytes(bytes + i * 3);
-            }
-        }
+        void fromBytes(uint8_t* bytes);
 
 };

@@ -4,10 +4,9 @@
 #include <Adafruit_NeoPixel.h>
 #include <vector>
 #include "led/LedPixel.h"
-#include "AdafruitLedStrip.h"
 #include "colors/ColorRGB.h"
 
-class AdafruitLedPixel : LedPixel
+class AdafruitLedPixel : public LedPixel
 {
     private:
         uint8_t* _pixel;
