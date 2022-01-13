@@ -1,44 +1,30 @@
 #pragma once
 
 #include <cmath>
-#include "MatrixAnimation.h"
+#include "CycleAnimation.h"
 #include "colors/ColorHSV.h"
 
-class Rainbow45 : public MatrixAnimation
+class Rainbow45 : public CycleAnimation<LedMatrix>
 {
-private:
-    uint32_t _height;
-    float _pos;
 public:
-    Rainbow45(uint32_t length)
+    Rainbow45(uint32_t length) : CycleAnimation((float)length)
     {
-        _height = length;
-        _pos = 0;
     }
 
-    virtual void MoveFrame(float delta)
+    virtual void apply(LedMatrix* matrix) const override
     {
-        _pos += delta;
-        _pos = std::fmod(_pos, _height);
-        if(_pos < 0)
-            _pos += _height;
-    }
+        float step = 360.0f / _maxTime;
+        float h = _currentTime * step;
 
-
-    virtual void Apply(LedMatrix& matrix) const
-    {
-        float step = 360.0f / _height;
-        float h = _pos * step;
-
-        for(int x = 0; x < matrix.getWidth() + matrix.getHeight(); x++)
+        for(int x = 0; x < matrix->getWidth() + matrix->getHeight(); x++)
         {
             ColorHSV color(h, 1.0f, 1.0f);
-            for(int y = 0; y <= x && y < matrix.getHeight(); y++)
+            for(int y = 0; y <= x && y < matrix->getHeight(); y++)
             {
                 int realX = x - y;
-                if(realX >= matrix.getWidth())
+                if(realX >= matrix->getWidth())
                     continue;
-                matrix.getPixel(realX, y)->setColor(color);
+                matrix->getPixel(realX, y)->setColor(color);
             }
 
             h += step;

@@ -93,6 +93,8 @@ void setup() {
 
   matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 2, NEO_GRB + NEO_KHZ800));
   matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 4, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 15, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(4, 13, 16, NEO_GRB + NEO_KHZ800));
   matrixSet = new LedMatrixSet(container_cast(matrixes.strips), LedMatrixSet::Right);
 
   Serial.begin(9600);
@@ -112,8 +114,9 @@ void setup() {
 
 }
 
-Rainbow45 anim(25);
-//Snake anim(8*32, ColorRGB(0, 0, 255));
+Animation<LedMatrix>* animation = new Rainbow45(25);
+//Animation<LedMatrix>* animation = new Snake(8*32, ColorRGB(0, 0, 255));
+
 float speed = 8.0f;
 unsigned long lastMillis; 
 
@@ -156,14 +159,14 @@ void loop() {
   if(serverWorking)
     server.handleClient();
 
-  anim.Apply(*matrixSet);
+  animation->apply(matrixSet);
   matrixes.show();
 
   unsigned long currMillis = millis();
   unsigned long delta = currMillis - lastMillis;
   lastMillis = currMillis;
   
-  anim.MoveFrame(speed * delta / 1000);
+  animation->moveTime(speed * delta / 1000);
   delay(10);
 }
 
