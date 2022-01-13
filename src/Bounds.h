@@ -7,8 +7,7 @@ template <typename T>
 class Bounds
 {
     private:
-        Vector2<T> _first;
-        Vector2<T> _second;
+        T _minX, _maxX, _minY, _maxY;
 
     public:
 
@@ -19,11 +18,21 @@ class Bounds
 
         Bounds(Vector2<T> first, Vector2<T> second)
         {
-            _first = first;
-            _second = second;
+            _minX = std::min(first.x, second.x);
+            _maxX = std::max(first.x, second.x);
+            _minY = std::min(first.y, second.y);
+            _maxY = std::max(first.y, second.y);
         }
 
-        bool isInside(Vector2<T> position)
+        Bounds(T minX, T minY, T maxX, T maxY)
+        {
+            _minX = std::min(minX, maxX);
+            _maxX = std::max(minX, maxX);
+            _minY = std::min(minY, maxY);
+            _maxY = std::max(minY, maxY);
+        }
+
+        bool isInside(Vector2<T> position) const
         {
             return position.x >= getLeft() &&
                    position.x <= getRight() &&
@@ -31,23 +40,23 @@ class Bounds
                    position.y <= getUp();
         }
 
-        T getLeft()
+        T getLeft() const
         {
-            return std::min(_first.x, _second.x);
+            return _minX;
         }
 
-        T getRight()
+        T getRight() const
         {
-            return std::max(_first.x, _second.x);
+            return _maxX;
         }
 
-        T getUp()
+        T getUp() const
         {
-            return std::max(_first.y, _second.y);
+            return _maxY;
         }
         
-        T getDown()
+        T getDown() const
         {
-            return std::min(_first.y, _second.y);
+            return _minY;
         }
 };

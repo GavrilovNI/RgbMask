@@ -15,7 +15,7 @@ public:
         _color = color;
     }
 
-    virtual void apply(LedMatrix* matrix) const
+    virtual void apply(std::shared_ptr<LedMatrix> matrix) const
     {
         matrix->clear();
         int i;

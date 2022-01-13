@@ -13,6 +13,7 @@
 #include "utils/ContainerConventer.h"
 #include "led/adafruit/AdafruitLedStripContainer.h"
 #include "masks/Circle.h"
+#include "masks/Square.h"
 
 AdafruitLedStripContainer<AdafruitLedSnakeMatrix> matrixes;
 
@@ -161,8 +162,14 @@ void loop() {
     server.handleClient();
 
   matrixes.clear();
-  Circle circleMask(matrixSet, Vector2<uint16_t>(12, 6), 6);
-  animation->apply(&circleMask);
+
+  auto circle = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(12, 6), 6);
+  auto square = std::make_shared<Square>(matrixSet, Bounds<uint16_t>(1, 2, 9, 5));
+
+  auto mask = circle->or_(square);
+  //auto mask = square;
+
+  animation->apply(mask);
   matrixes.show();
 
   unsigned long currMillis = millis();

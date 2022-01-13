@@ -6,6 +6,6 @@ class Animation
 public:
     virtual void moveTime(float delta) = 0;
 
-    virtual void apply(T* object) const = 0;
+    virtual void apply(std::shared_ptr<T> object) const = 0;
 };
 

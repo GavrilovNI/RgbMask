@@ -11,7 +11,7 @@ public:
     {
     }
 
-    virtual void apply(LedMatrix* matrix) const override
+    virtual void apply(std::shared_ptr<LedMatrix> matrix) const override
     {
         float step = 360.0f / _maxTime;
         float h = _currentTime * step;
