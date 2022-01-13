@@ -8,8 +8,8 @@
 class AdafruitLedSnakeMatrix : public LedSnakeMatrix, public Adafruit_NeoPixel
 {
     public:
-        AdafruitLedSnakeMatrix(uint16_t width, uint16_t height, int16_t pin = 6, neoPixelType type = NEO_GRB + NEO_KHZ800)
-            : LedSnakeMatrix(width, height), Adafruit_NeoPixel(width * height, pin, type)
+        AdafruitLedSnakeMatrix(Vector2<uint16_t> size, int16_t pin = 6, neoPixelType type = NEO_GRB + NEO_KHZ800)
+            : LedSnakeMatrix(size), Adafruit_NeoPixel(size.square(), pin, type)
         {
         }
 
@@ -28,8 +28,8 @@ class AdafruitLedSnakeMatrix : public LedSnakeMatrix, public Adafruit_NeoPixel
             return std::make_shared<AdafruitLedPixel>(pixel, rOffset, gOffset, bOffset, wOffset, brightness);
         }
 
-        virtual std::shared_ptr<LedPixel> getPixel(uint16_t x, uint16_t y) const override
+        virtual std::shared_ptr<LedPixel> getPixel(Vector2<uint16_t> position) const override
         {
-            return LedSnakeMatrix::getPixel(x, y);
+            return LedSnakeMatrix::getPixel(position);
         }
 };

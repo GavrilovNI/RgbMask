@@ -8,6 +8,18 @@ ColorRGB::ColorRGB(uint8_t r, uint8_t g, uint8_t b)
     this->b = b;
 }
 
+ColorRGB::ColorRGB(uint8_t* bytes)
+{
+    r = bytes[0];
+    g = bytes[1];
+    b = bytes[2];
+}
+
+std::vector<uint8_t> ColorRGB::toBytes() const
+{
+    return std::vector<uint8_t> { r, g, b };
+}
+
 uint32_t ColorRGB::toUInt32() const
 {
     return (((uint32_t)r) << 16) + (((uint32_t)g) << 8) + b;

@@ -23,16 +23,6 @@ class AdafruitLedPixel : public LedPixel
 
         }
 
-        std::vector<uint8_t> toBytes() const override
-        {
-            return std::vector<uint8_t> { _pixel[_rOffset], _pixel[_gOffset], _pixel[_bOffset] };
-        }
-
-        void fromBytes(uint8_t* bytes)
-        {
-            setColor(bytes[0], bytes[1], bytes[2]);
-        }
-
         ColorRGB getColor() const override
         {
             uint8_t r = _pixel[_rOffset];

@@ -2,17 +2,26 @@
 
 #include <cstdint>
 #include "LedStrip.h"
+#include "Vector2.h"
 
 class LedMatrix : public LedStrip
 {
     protected:
-        uint16_t _width, _height;
+        Vector2<uint16_t> _size;
 
     public:
-        LedMatrix(uint16_t width, uint16_t height);
+        using LedStrip::getPixel;
+        
+        LedMatrix(Vector2<uint16_t> size) : LedStrip(size.square())
+        {
+            _size = size;
+        }
 
-        virtual std::shared_ptr<LedPixel> getPixel(uint16_t x, uint16_t y) const = 0;
+        virtual std::shared_ptr<LedPixel> getPixel(Vector2<uint16_t> position) const = 0;
 
-        uint16_t getWidth();
-        uint16_t getHeight();
+
+        Vector2<uint16_t> getSize()
+        {
+            return _size;
+        }
 };

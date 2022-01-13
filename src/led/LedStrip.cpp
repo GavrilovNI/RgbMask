@@ -14,7 +14,7 @@ void LedStrip::clear()
 {
     for(int i = 0; i < getLength(); i++)
     {
-        getPixel(i)->clear();
+        getPixel(i)->setColor(ColorRGB(0, 0, 0));
     }
 }
 
@@ -24,7 +24,7 @@ std::vector<uint8_t> LedStrip::toBytes() const
     uint16_t pixelsCount = getLength();
     for(int i = 0; i < pixelsCount; i++)
     {
-        std::vector<uint8_t> pixelBytes = getPixel(i)->toBytes();
+        std::vector<uint8_t> pixelBytes = getPixel(i)->getColor().toBytes();
         result.insert(result.end(), pixelBytes.begin(), pixelBytes.end());
     }
     return result;
@@ -35,6 +35,7 @@ void LedStrip::fromBytes(uint8_t* bytes)
     uint16_t pixelsCount = getLength();
     for(int i = 0; i < pixelsCount; i++)
     {
-        getPixel(i)->fromBytes(bytes + i * 3);
+        ColorRGB newColor(bytes + i * 3);
+        getPixel(i)->setColor(newColor);
     }
 }

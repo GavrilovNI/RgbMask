@@ -7,11 +7,12 @@
 #include <vector>
 #include "WifiManager.h"
 #include "led/adafruit/AdafruitLedSnakeMatrix.h"
-#include "animations/Rainbow45.h"
-#include "animations/Snake.h"
+#include "animations/matrix/Rainbow45.h"
+#include "animations/matrix/Snake.h"
 #include "led/LedMatrixSet.h"
 #include "utils/ContainerConventer.h"
 #include "led/adafruit/AdafruitLedStripContainer.h"
+#include "masks/Circle.h"
 
 AdafruitLedStripContainer<AdafruitLedSnakeMatrix> matrixes;
 
@@ -91,10 +92,10 @@ void saveWifiSettings()
 
 void setup() {
 
-  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 2, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 4, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(7, 13, 15, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(4, 13, 16, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 2, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 4, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 15, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(4, 13), 16, NEO_GRB + NEO_KHZ800));
   matrixSet = new LedMatrixSet(container_cast(matrixes.strips), LedMatrixSet::Right);
 
   Serial.begin(9600);
@@ -159,7 +160,9 @@ void loop() {
   if(serverWorking)
     server.handleClient();
 
-  animation->apply(matrixSet);
+  matrixes.clear();
+  Circle circleMask(matrixSet, Vector2<uint16_t>(12, 6), 6);
+  animation->apply(&circleMask);
   matrixes.show();
 
   unsigned long currMillis = millis();
@@ -202,7 +205,7 @@ void onSetColor()
 
   if(x >= 0 && y >= 0)
   {
-    matrixSet->getPixel(x, y)->setColor(ColorRGB(r, g, b));
+    matrixSet->getPixel(Vector2<uint16_t>(x, y))->setColor(ColorRGB(r, g, b));
     matrixes.show();
     server.send(200, "text/plain", "done");  
   }

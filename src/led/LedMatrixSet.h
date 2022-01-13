@@ -20,56 +20,57 @@ class LedMatrixSet : public LedMatrix
         Direction _direction;
 
     public:
-        LedMatrixSet(std::vector<LedMatrix*> matrixes, Direction direction) : LedMatrix(0, 0)
+        LedMatrixSet(std::vector<LedMatrix*> matrixes, Direction direction) : LedMatrix(Vector2<uint16_t>(0, 0))
         {
             _matrixes = matrixes;
             _direction = direction;
 
-            uint16_t width = 0;
-            uint16_t height = 0;
+            Vector2<uint16_t> size(0, 0);
 
             for(int i = 0; i < _matrixes.size(); i++)
             {
+                Vector2<uint16_t> currMatrixSize = _matrixes[i]->getSize();
                 if(_direction == Direction::Right)
                 {
-                    if(_matrixes[0]->getHeight() != _matrixes[i]->getHeight())
+                    if(_matrixes[0]->getSize().y != currMatrixSize.y)
                         throw "matrixes heights must be equal";
-                    width += _matrixes[i]->getWidth();
-                    height = _matrixes[i]->getHeight();
+
+                    size.x += currMatrixSize.x;
+                    size.y = currMatrixSize.y;
                 }
                 else if(_direction == Direction::Down)
                 {
-                    if(_matrixes[0]->getWidth() != _matrixes[i]->getWidth())
+                    if(_matrixes[0]->getSize().x != currMatrixSize.x)
                         throw "matrixes widths must be equal";
-                    width = _matrixes[i]->getWidth();
-                    height += _matrixes[i]->getHeight();
+
+                    size.x = currMatrixSize.x;
+                    size.y += currMatrixSize.y;
                 }
             }
 
-            _width = width;
-            _height = height;
+            _size = size;
         }
 
-        virtual std::shared_ptr<LedPixel> getPixel(uint16_t x, uint16_t y) const override
+        virtual std::shared_ptr<LedPixel> getPixel(Vector2<uint16_t> position) const override
         {
             for(int i = 0; i < _matrixes.size(); i++)
             {
                 LedMatrix* currMatrix = _matrixes[i];
                 if(_direction == Direction::Right)
                 {
-                    uint16_t currMatrixWidth = currMatrix->getWidth();
-                    if(x < currMatrixWidth)
-                        return currMatrix->getPixel(x, y);
+                    uint16_t currMatrixWidth = currMatrix->getSize().x;
+                    if(position.x < currMatrixWidth)
+                        return currMatrix->getPixel(position);
                     else
-                        x -= currMatrixWidth;
+                        position.x -= currMatrixWidth;
                 }
                 else if(_direction == Direction::Down)
                 {
-                    uint16_t currMatrixHeight = currMatrix->getHeight();
-                    if(y < currMatrixHeight)
-                        return currMatrix->getPixel(x, y);
+                    uint16_t currMatrixHeight = currMatrix->getSize().y;
+                    if(position.y < currMatrixHeight)
+                        return currMatrix->getPixel(position);
                     else
-                        y -= currMatrixHeight;
+                        position.y -= currMatrixHeight;
                 }
             }
 
@@ -78,13 +79,13 @@ class LedMatrixSet : public LedMatrix
 
         virtual std::shared_ptr<LedPixel> getPixel(uint16_t index) const override
         {
-            /*for(int i = 0; i < _matrixes.size(); i++)
+            for(int i = 0; i < _matrixes.size(); i++)
             {
                 LedMatrix* currMatrix = _matrixes[i];
                 uint16_t currMatrixLength = currMatrix->getLength();
                 if(index < currMatrixLength)
                 {
-                    return currMatrix->LedStrip::getPixel(index);
+                    return currMatrix->getPixel(index);
                 }
                 else
                 {
@@ -92,8 +93,7 @@ class LedMatrixSet : public LedMatrix
                 }
             }
 
-            return nullptr;*/
-            throw "not implemented";
+            return nullptr;
         }
 
         

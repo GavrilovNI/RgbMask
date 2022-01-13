@@ -7,13 +7,13 @@ class LedSnakeMatrix : public LedMatrix
 {
     using LedStrip::getPixel;
     public:
-        LedSnakeMatrix(uint16_t width, uint16_t height) : LedMatrix(width, height)
+        LedSnakeMatrix(Vector2<uint16_t> size) : LedMatrix(size)
         {
         }
         
-        virtual std::shared_ptr<LedPixel> getPixel(uint16_t x, uint16_t y) const override
+        virtual std::shared_ptr<LedPixel> getPixel(Vector2<uint16_t> position) const override
         {
-            uint16_t index = x * _height + (x % 2 == 0 ? y : _height - y - 1);
+            uint16_t index = position.x * _size.y + (position.x % 2 == 0 ? position.y : _size.y - position.y - 1);
             return getPixel(index);
         }
 };
