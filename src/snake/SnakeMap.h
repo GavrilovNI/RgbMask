@@ -29,6 +29,10 @@ public:
 
     Vector2<uint16_t> normalizePos(Vector2<uint16_t> pos) const;
 
+    void addWall(Vector2<uint16_t> pos);
+
+    void removeWall(Vector2<uint16_t> pos);
+
     void addWall(Bounds<uint16_t> wall);
 
     void removeWall(Bounds<uint16_t> wall);
@@ -48,4 +52,6 @@ public:
     bool isFood(Vector2<uint16_t> pos) const;
 
     SnakeMapTile getTile(Vector2<uint16_t> pos) const;
+
+    Vector2<uint16_t> getSize() const;
 };

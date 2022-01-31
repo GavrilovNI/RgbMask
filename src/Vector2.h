@@ -53,7 +53,12 @@ public:
 
     bool operator<(const Vector2<T>& other) const
     {
-        return x < other.x;
+        if (x < other.x)
+            return true;
+        else if (other.x < x)
+            return false;
+        else
+            return y < other.y;
     }
 
     Vector2<T>& operator=(const Vector2<T>& other)

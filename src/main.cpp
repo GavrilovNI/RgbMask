@@ -15,6 +15,7 @@
 
 #include "snake/Snake.h"
 #include "snake/SnakeMap.h"
+#include "snake/SnakeMapUpdater.h"
 
 #include "animations/matrix/Rainbow45.h"
 #include "animations/matrix/SnakeAnim.h"
@@ -105,6 +106,7 @@ void saveWifiSettings()
 
 std::shared_ptr<SnakeMap> snakeMap;
 std::shared_ptr<Snake> snake;
+std::shared_ptr<SnakeMapUpdater> snakeMapUpdater = std::make_shared<SnakeMapUpdater>();
 
 
 //std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(255, 0, 0));
@@ -124,8 +126,10 @@ void setup()
   snake = std::make_shared<Snake>(Vector2<uint16_t>(3, 3), Direction::Right, 3);
   snakeMap = std::make_shared<SnakeMap>(matrixSet->getSize());
   snakeMap->addSnake(snake);
+  snakeMap->addFood(Vector2<uint16_t>(3, 5));
+  snakeMap->addWall(Vector2<uint16_t>(2, 4));
 
-  colorer = std::make_shared<SnakeMapDrawer>(snakeMap, ColorRGB(255, 0, 0), ColorRGB(0, 255, 0), ColorRGB(0, 255, 255));
+  colorer = std::make_shared<SnakeMapDrawer>(snakeMap, ColorRGB(255, 0, 0), ColorRGB(0, 255, 0), ColorRGB(255, 255, 0));
 
   Serial.begin(9600);
   
@@ -162,7 +166,7 @@ int snakeStepTime = 500;
 
 void loop()
 {
-  Serial.println("loop");
+  //Serial.println("loop");
 
   /*if(wifi.isAccessPoint() == false)
   {
@@ -216,12 +220,16 @@ void loop()
   int snakeMoves = (int)floor(snakeTime / snakeStepTime);
   snakeTime -= snakeMoves * snakeStepTime;
 
+  
   for(int i = 0; i < snakeMoves; i++)
   {
-    snake->move(snakeMap);
-    if(snakeMoveNum % 2 == 0)
-      snake->turnLeft();
-    snakeMoveNum++;
+    if(snake->isDead() == false)
+    {
+      snake->move(snakeMap, snakeMapUpdater);
+      if(snakeMoveNum % 2 == 0)
+        snake->turnLeft();
+      snakeMoveNum++;
+    }
   }
 
   colorer->apply(mask);
