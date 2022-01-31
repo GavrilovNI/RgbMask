@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Arduino.h>
 
 template<typename T>
 class Vector2
@@ -20,6 +20,50 @@ public:
         this->y = y;
     }
 
+    Vector2(const Vector2<T>& other)
+    {
+        this->x = other.x;
+        this->y = other.y;
+    }
+
+    Vector2<T> operator+(const Vector2<T>& other) const
+    {
+        return Vector2(x + other.x, y + other.y);
+    }
+
+    Vector2<T> operator-(const Vector2<T>& other) const
+    {
+        return Vector2(x - other.x, y - other.y);
+    }
+
+    Vector2<T> operator-() const
+    {
+        return Vector2(-x, -y);
+    }
+
+    Vector2<T> operator*(const float& value) const
+    {
+        return Vector2(x * value, y * value);
+    }
+
+    bool operator==(const Vector2<T>& other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
+    bool operator<(const Vector2<T>& other) const
+    {
+        return x < other.x;
+    }
+
+    Vector2<T>& operator=(const Vector2<T>& other)
+    {
+        x = other.x;
+        y = other.y;
+
+        return *this;
+    }
+
     float sqrDistance(Vector2<T> to) const
     {
         float xDist = 1.0f * x - to.x;
@@ -30,6 +74,11 @@ public:
     T square() const
     {
         return x * y;
+    }
+
+    String toString() const
+    {
+        return "Vector2(" + String(x) + "; " + String(y) + ")";
     }
 };
 

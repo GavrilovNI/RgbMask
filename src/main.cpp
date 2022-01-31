@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <Stream.h>
 #include <vector>
+#include <cmath>
 #include "WifiManager.h"
 #include "led/adafruit/AdafruitLedSnakeMatrix.h"
 #include "led/adafruit/AdafruitLedStripContainer.h"
@@ -12,14 +13,18 @@
 #include "utils/ContainerConventer.h"
 #include "masks/BrightnessLedPixel.h"
 
+#include "snake/Snake.h"
+#include "snake/SnakeMap.h"
+
 #include "animations/matrix/Rainbow45.h"
-#include "animations/matrix/Snake.h"
+#include "animations/matrix/SnakeAnim.h"
 
 #include "masks/matrix/Circle.h"
 #include "masks/matrix/Square.h"
 #include "masks/matrix/BrightnessGradient.h"
 
 #include "colorer/matrix/Solid.h"
+#include "colorer/matrix/SnakeMapDrawer.h"
 
 AdafruitLedStripContainer<AdafruitLedSnakeMatrix> matrixes;
 
@@ -97,6 +102,14 @@ void saveWifiSettings()
   }
 }
 
+
+std::shared_ptr<SnakeMap> snakeMap;
+std::shared_ptr<Snake> snake;
+
+
+//std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(255, 0, 0));
+std::shared_ptr<Colorer<LedMatrix>> colorer;
+
 void setup()
 {
 
@@ -108,6 +121,12 @@ void setup()
   */
   matrixSet = std::make_shared<LedMatrixSet>(container_cast(matrixes.strips), LedMatrixSet::Right);
 
+  snake = std::make_shared<Snake>(Vector2<uint16_t>(3, 3), Direction::Right, 3);
+  snakeMap = std::make_shared<SnakeMap>(matrixSet->getSize());
+  snakeMap->addSnake(snake);
+
+  colorer = std::make_shared<SnakeMapDrawer>(snakeMap, ColorRGB(255, 0, 0), ColorRGB(0, 255, 0), ColorRGB(0, 255, 255));
+
   Serial.begin(9600);
   
   //server.on("/", onHome);
@@ -117,7 +136,7 @@ void setup()
   matrixes.begin();
   matrixes.clear();
   matrixes.show();
-  matrixes.setBrightness(10);
+  matrixes.setBrightness(30);
 
   Serial.println("Begin");
 
@@ -128,8 +147,6 @@ void setup()
 }
 
 
-std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(255, 0, 0));
-
 
 //Animation<LedMatrix>* animation = new Rainbow45(25);
 //Animation<LedMatrix>* animation = new Snake(8*32, ColorRGB(0, 0, 255));
@@ -137,7 +154,15 @@ std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(2
 float speed = 8.0f;
 unsigned long lastMillis; 
 
-void loop() {
+
+float snakeTime;
+
+int snakeMoveNum = 0;
+int snakeStepTime = 500;
+
+void loop()
+{
+  Serial.println("loop");
 
   /*if(wifi.isAccessPoint() == false)
   {
@@ -177,19 +202,27 @@ void loop() {
     server.handleClient();
 */
 
-
-Serial.println("loop");
-
   matrixes.clear();
 
-  auto circle = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(5, 4), 0, 4);
+  //auto circle = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(5, 4), 0, 4);
   //auto square = std::make_shared<Square>(matrixSet, Bounds<uint16_t>(1, 2, 9, 5));
 
   //auto mask = circle->max_(square);
   //auto mask = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(12, 6), 3, 5);
   //auto mask = std::make_shared<BrightnessGradient>(matrixSet, matrixSet->getSize().x);
-  auto mask = circle;
-  //auto mask = matrixSet;
+  //auto mask = circle;
+  auto mask = matrixSet;
+
+  int snakeMoves = (int)floor(snakeTime / snakeStepTime);
+  snakeTime -= snakeMoves * snakeStepTime;
+
+  for(int i = 0; i < snakeMoves; i++)
+  {
+    snake->move(snakeMap);
+    if(snakeMoveNum % 2 == 0)
+      snake->turnLeft();
+    snakeMoveNum++;
+  }
 
   colorer->apply(mask);
   matrixes.show();
@@ -197,6 +230,8 @@ Serial.println("loop");
   unsigned long currMillis = millis();
   unsigned long delta = currMillis - lastMillis;
   lastMillis = currMillis;
+
+  snakeTime += delta;
   
   //animation->moveTime(speed * delta / 1000);
   delay(10);
