@@ -29,15 +29,15 @@ void ColorHSV::setV(float v)
     this->v = v;
 }
     
-float ColorHSV::getH()
+float ColorHSV::getH() const
 {
     return h;
 }
-float ColorHSV::getS()
+float ColorHSV::getS() const
 {
     return s;
 }
-float ColorHSV::getV()
+float ColorHSV::getV() const
 {
     return v;
 }
@@ -70,4 +70,13 @@ ColorRGB ColorHSV::toRGB() const
     g = (g+m)*255;
     b = (b+m)*255;
     return ColorRGB(r, g, b);
+}
+
+String ColorHSV::toString() const
+{
+    String strH(h);
+    String strS(s);
+    String strV(v); 
+
+    return String("ColorHSV(" + strH + ";" + strS + ";" + strV + ")");
 }

@@ -32,7 +32,7 @@ ColorHSV ColorRGB::toHSV() const
     float min = r < g ? r : g;
     min = min < b ? min : b;
     float max = r > g ? r : g;
-    max = max > b ? min : b;
+    max = max > b ? max : b;
 
     v = max / 255.0f;
     float delta = max - min;
@@ -57,4 +57,13 @@ ColorHSV ColorRGB::toHSV() const
         h += 360.0;
 
     return ColorHSV(h, s, v);
+}
+
+String ColorRGB::toString() const
+{
+    String strR(r);
+    String strG(g);
+    String strB(b);
+
+    return String("ColorRGB(" + strR + ";" + strG + ";" + strB + ")");
 }

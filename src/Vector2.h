@@ -22,8 +22,8 @@ public:
 
     float sqrDistance(Vector2<T> to) const
     {
-        float xDist = x - to.x;
-        float yDist = y - to.y;
+        float xDist = 1.0f * x - to.x;
+        float yDist = 1.0f * y - to.y;
         return xDist * xDist + yDist * yDist;
     }
 

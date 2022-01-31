@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 struct ColorRGB;
 
@@ -16,7 +17,9 @@ public:
     void setS(float s);
     void setV(float v);
     
-    float getH();
-    float getS();
-    float getV();
+    float getH() const;
+    float getS() const;
+    float getV() const;
+
+    String toString() const;
 };

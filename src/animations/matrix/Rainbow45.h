@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include "led/LedMatrix.h"
 #include "animations/CycleAnimation.h"
 #include "colors/ColorHSV.h"
 

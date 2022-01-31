@@ -27,7 +27,7 @@ class AdafruitLedPixel : public LedPixel
         {
             uint8_t r = _pixel[_rOffset];
             uint8_t g = _pixel[_gOffset];
-            uint8_t b = _pixel[_rOffset];
+            uint8_t b = _pixel[_bOffset];
             return ColorRGB(r, g, b);
         }
 

@@ -7,17 +7,23 @@
 #include <vector>
 #include "WifiManager.h"
 #include "led/adafruit/AdafruitLedSnakeMatrix.h"
-#include "animations/matrix/Rainbow45.h"
-#include "animations/matrix/Snake.h"
+#include "led/adafruit/AdafruitLedStripContainer.h"
 #include "led/LedMatrixSet.h"
 #include "utils/ContainerConventer.h"
-#include "led/adafruit/AdafruitLedStripContainer.h"
-#include "masks/Circle.h"
-#include "masks/Square.h"
+#include "masks/BrightnessLedPixel.h"
+
+#include "animations/matrix/Rainbow45.h"
+#include "animations/matrix/Snake.h"
+
+#include "masks/matrix/Circle.h"
+#include "masks/matrix/Square.h"
+#include "masks/matrix/BrightnessGradient.h"
+
+#include "colorer/matrix/Solid.h"
 
 AdafruitLedStripContainer<AdafruitLedSnakeMatrix> matrixes;
 
-LedMatrixSet* matrixSet;
+std::shared_ptr<LedMatrixSet> matrixSet;
 
 
 WifiManager wifi;
@@ -91,32 +97,41 @@ void saveWifiSettings()
   }
 }
 
-void setup() {
+void setup()
+{
 
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 2, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 4, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 15, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(32, 8), 16, NEO_GRB + NEO_KHZ800));
+  /*matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 19, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 5, NEO_GRB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 21, NEO_GRB + NEO_KHZ800));
   matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(4, 13), 16, NEO_GRB + NEO_KHZ800));
-  matrixSet = new LedMatrixSet(container_cast(matrixes.strips), LedMatrixSet::Right);
+  */
+  matrixSet = std::make_shared<LedMatrixSet>(container_cast(matrixes.strips), LedMatrixSet::Right);
 
   Serial.begin(9600);
   
-  server.on("/", onHome);
-  server.on("/setcolor", onSetColor);
-  server.on("/connect", onConnect);
+  //server.on("/", onHome);
+  //server.on("/setcolor", onSetColor);
+  //server.on("/connect", onConnect);
 
   matrixes.begin();
   matrixes.clear();
   matrixes.show();
-  matrixes.setBrightness(30);
+  matrixes.setBrightness(10);
 
-  setupSd();
+  Serial.println("Begin");
 
-  loadWifiSettings();
+  //setupSd();
+
+  //loadWifiSettings();
 
 }
 
-Animation<LedMatrix>* animation = new Rainbow45(25);
+
+std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(255, 0, 0));
+
+
+//Animation<LedMatrix>* animation = new Rainbow45(25);
 //Animation<LedMatrix>* animation = new Snake(8*32, ColorRGB(0, 0, 255));
 
 float speed = 8.0f;
@@ -124,7 +139,7 @@ unsigned long lastMillis;
 
 void loop() {
 
-  if(wifi.isAccessPoint() == false)
+  /*if(wifi.isAccessPoint() == false)
   {
     if(wifi.isConnected() == false)
     {
@@ -160,23 +175,30 @@ void loop() {
 
   if(serverWorking)
     server.handleClient();
+*/
+
+
+Serial.println("loop");
 
   matrixes.clear();
 
-  auto circle = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(12, 6), 6);
-  auto square = std::make_shared<Square>(matrixSet, Bounds<uint16_t>(1, 2, 9, 5));
+  auto circle = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(5, 4), 0, 4);
+  //auto square = std::make_shared<Square>(matrixSet, Bounds<uint16_t>(1, 2, 9, 5));
 
-  auto mask = circle->or_(square);
-  //auto mask = square;
+  //auto mask = circle->max_(square);
+  //auto mask = std::make_shared<Circle>(matrixSet, Vector2<uint16_t>(12, 6), 3, 5);
+  //auto mask = std::make_shared<BrightnessGradient>(matrixSet, matrixSet->getSize().x);
+  auto mask = circle;
+  //auto mask = matrixSet;
 
-  animation->apply(mask);
+  colorer->apply(mask);
   matrixes.show();
 
   unsigned long currMillis = millis();
   unsigned long delta = currMillis - lastMillis;
   lastMillis = currMillis;
   
-  animation->moveTime(speed * delta / 1000);
+  //animation->moveTime(speed * delta / 1000);
   delay(10);
 }
 

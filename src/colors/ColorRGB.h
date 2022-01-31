@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdint.h>
 #include <vector>
+#include <Arduino.h>
+#include <stdint.h>
 
 struct ColorHSV;
 
@@ -19,5 +20,6 @@ public:
 
     std::vector<uint8_t> toBytes() const;
     
+    String toString() const;
 };
 

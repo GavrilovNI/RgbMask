@@ -1,7 +1,10 @@
+
+#include <algorithm>
 #include "LedMatrixMask.h"
 #include "SimpleMask.h"
+#include "BrightnessLedPixel.h"
 
-LedMatrixMask::LedMatrixMask(LedMatrix* ledMatrix) : LedMatrix(ledMatrix->getSize())
+LedMatrixMask::LedMatrixMask(std::shared_ptr<LedMatrix> ledMatrix) : LedMatrix(ledMatrix->getSize())
 {
     _ledMatrix = ledMatrix;
 }
@@ -13,40 +16,32 @@ std::shared_ptr<LedPixel> LedMatrixMask::getPixel(uint16_t index) const
 
 std::shared_ptr<LedPixel> LedMatrixMask::getPixel(Vector2<uint16_t> position) const
 {
-    if(hasPixel(position))
-        return _ledMatrix->getPixel(position);
-    else
-        return std::make_shared<FooLedPixel>();
+    auto pixel = _ledMatrix->getPixel(position);
+    auto brightness = getPixelBrightness(position);
+
+    return std::make_shared<BrightnessLedPixel>(pixel, brightness);
 }
 
 std::shared_ptr<LedMatrixMask> LedMatrixMask::invert()
 {
     return std::make_shared<SimpleMask>(_ledMatrix, [&](Vector2<uint16_t> position)
         {
-            return !this->hasPixel(position);
+            return 255 - this->getPixelBrightness(position);
         });
 }
 
-std::shared_ptr<LedMatrixMask> LedMatrixMask::and_(std::shared_ptr<LedMatrixMask> mask)
+std::shared_ptr<LedMatrixMask> LedMatrixMask::max_(std::shared_ptr<LedMatrixMask> mask)
 {
     return std::make_shared<SimpleMask>(_ledMatrix, [&, mask](Vector2<uint16_t> position)
         {
-            return this->hasPixel(position) && mask->hasPixel(position);
+            return std::max(this->getPixelBrightness(position), mask->getPixelBrightness(position));
         });
 }
 
-std::shared_ptr<LedMatrixMask> LedMatrixMask::or_(std::shared_ptr<LedMatrixMask> mask)
+std::shared_ptr<LedMatrixMask> LedMatrixMask::min_(std::shared_ptr<LedMatrixMask> mask)
 {
     return std::make_shared<SimpleMask>(_ledMatrix, [&, mask](Vector2<uint16_t> position)
         {
-            return this->hasPixel(position) || mask->hasPixel(position);
-        });
-}
-
-std::shared_ptr<LedMatrixMask> LedMatrixMask::xor_(std::shared_ptr<LedMatrixMask> mask)
-{
-    return std::make_shared<SimpleMask>(_ledMatrix, [&, mask](Vector2<uint16_t> position)
-        {
-            return this->hasPixel(position) != mask->hasPixel(position);
+            return std::min(this->getPixelBrightness(position), mask->getPixelBrightness(position));
         });
 }

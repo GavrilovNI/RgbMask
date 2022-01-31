@@ -8,9 +8,15 @@
 class SimpleMask : public LedMatrixMask
 {
     protected:
-        std::function<bool(Vector2<uint16_t>)> _hasPixelFunc;
+        std::function<uint8_t(Vector2<uint16_t>)> _getPixelBrightnessFunc;
     public:
-        SimpleMask(LedMatrix* ledMatrix, std::function<bool(Vector2<uint16_t>)> hasPixelFunc);
+        SimpleMask(std::shared_ptr<LedMatrix> ledMatrix, std::function<uint8_t(Vector2<uint16_t>)> getPixelBrightnessFunc) : LedMatrixMask(ledMatrix)
+        {
+            _getPixelBrightnessFunc = getPixelBrightnessFunc;
+        }
 
-        virtual bool hasPixel(Vector2<uint16_t> position) const override;
+        virtual uint8_t getPixelBrightness(Vector2<uint16_t> position) const override
+        {
+            return _getPixelBrightnessFunc(position);
+        }
 };
