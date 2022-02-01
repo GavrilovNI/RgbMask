@@ -1,8 +1,9 @@
 #include "Snake.h"
 #include "SnakeMap.h"
 #include "SnakeMapUpdater.h"
+#include <Arduino.h>
 
-Vector2<uint16_t> Snake::directionToVector2(Direction direction)
+Vector2<uint16_t> directionToVector2(Direction direction)
 {
     switch (direction)
     {
@@ -17,6 +18,16 @@ Vector2<uint16_t> Snake::directionToVector2(Direction direction)
     default:
         throw "not implemented";
     }
+}
+
+Direction turnRight(Direction direction)
+{
+    return (Direction)(((int)direction + 1) % ((int)Direction::Count));
+}
+
+Direction turnLeft(Direction direction)
+{
+    return (Direction)(((int)direction - 1 + (int)Direction::Count) % ((int)Direction::Count));
 }
 
 Snake::Snake(Vector2<uint16_t> pos, Direction direction, int initialLength)
@@ -38,7 +49,13 @@ void Snake::move(std::shared_ptr<SnakeMap> snakeMap, std::shared_ptr<SnakeMapUpd
     auto nextPos = _body.front() + directionToVector2(_direction);
     nextPos = snakeMap->normalizePos(nextPos);
     
-    switch (snakeMap->getTile(nextPos))
+    SnakeMapTile nextTile = snakeMap->getTile(nextPos);
+    if(nextPos == _body.back())
+    {
+        nextTile = SnakeMapTile::Empty; // if snake want to eat tail, but tail is gonna move
+    }
+
+    switch (nextTile)
     {
     case SnakeMapTile::Wall:
     case SnakeMapTile::Snake:
@@ -61,12 +78,12 @@ void Snake::move(std::shared_ptr<SnakeMap> snakeMap, std::shared_ptr<SnakeMapUpd
 
 void Snake::turnRight()
 {
-    _direction = (Direction)(((int)_direction + 1) % ((int)Direction::Count));
+    _direction = ::turnRight(_direction);
 }
 
 void Snake::turnLeft()
 {
-    _direction = (Direction)(((int)_direction - 1 + (int)Direction::Count) % ((int)Direction::Count));
+    _direction = ::turnLeft(_direction);
 }
 
 bool Snake::isBody(Vector2<uint16_t> pos) const
@@ -87,4 +104,9 @@ bool Snake::isDead() const
 const std::list<Vector2<uint16_t>>& Snake::getBody() const
 {
     return _body;
+}
+
+Direction Snake::getDirection() const
+{
+    return _direction;
 }

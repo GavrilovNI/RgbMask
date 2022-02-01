@@ -51,6 +51,11 @@ public:
         return x == other.x && y == other.y;
     }
 
+    bool operator!=(const Vector2<T>& other) const
+    {
+        return x != other.x || y != other.y;
+    }
+
     bool operator<(const Vector2<T>& other) const
     {
         if (x < other.x)

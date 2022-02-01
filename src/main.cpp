@@ -16,6 +16,7 @@
 #include "snake/Snake.h"
 #include "snake/SnakeMap.h"
 #include "snake/SnakeMapUpdater.h"
+#include "snake/AutoSnake.h"
 
 #include "animations/matrix/Rainbow45.h"
 #include "animations/matrix/SnakeAnim.h"
@@ -107,6 +108,8 @@ void saveWifiSettings()
 std::shared_ptr<SnakeMap> snakeMap;
 std::shared_ptr<Snake> snake;
 std::shared_ptr<SnakeMapUpdater> snakeMapUpdater = std::make_shared<SnakeMapUpdater>();
+std::shared_ptr<AutoSnake> autoSnake;
+
 
 
 //std::shared_ptr<Colorer<LedMatrix>> colorer = std::make_shared<Solid>(ColorRGB(255, 0, 0));
@@ -114,7 +117,6 @@ std::shared_ptr<Colorer<LedMatrix>> colorer;
 
 void setup()
 {
-
   matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(32, 8), 16, NEO_GRB + NEO_KHZ800));
   /*matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 19, NEO_GRB + NEO_KHZ800));
   matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 5, NEO_GRB + NEO_KHZ800));
@@ -126,8 +128,10 @@ void setup()
   snake = std::make_shared<Snake>(Vector2<uint16_t>(3, 3), Direction::Right, 3);
   snakeMap = std::make_shared<SnakeMap>(matrixSet->getSize());
   snakeMap->addSnake(snake);
-  snakeMap->addFood(Vector2<uint16_t>(3, 5));
-  snakeMap->addWall(Vector2<uint16_t>(2, 4));
+
+  snakeMapUpdater->spawnFood(snakeMap);
+
+  autoSnake = std::make_shared<AutoSnake>(snake, snakeMap);
 
   colorer = std::make_shared<SnakeMapDrawer>(snakeMap, ColorRGB(255, 0, 0), ColorRGB(0, 255, 0), ColorRGB(255, 255, 0));
 
@@ -161,8 +165,7 @@ unsigned long lastMillis;
 
 float snakeTime;
 
-int snakeMoveNum = 0;
-int snakeStepTime = 500;
+int snakeStepTime = 200;
 
 void loop()
 {
@@ -225,10 +228,12 @@ void loop()
   {
     if(snake->isDead() == false)
     {
+      autoSnake->decide();
       snake->move(snakeMap, snakeMapUpdater);
-      if(snakeMoveNum % 2 == 0)
-        snake->turnLeft();
-      snakeMoveNum++;
+    }
+    else
+    {
+      ESP.restart();
     }
   }
 

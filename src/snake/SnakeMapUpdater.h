@@ -24,6 +24,11 @@ public:
     {
         snakeMap->removeFood(pos);
 
+        spawnFood(snakeMap);
+    }
+
+    void spawnFood(std::shared_ptr<SnakeMap> snakeMap)
+    {
         auto size = snakeMap->getSize();
 
         std::vector<Vector2<uint16_t>> emptyTilePoses;
@@ -31,14 +36,18 @@ public:
         {
             for(uint16_t x = 0; x < size.x; x++)
             {
-                emptyTilePoses.push_back(Vector2<uint16_t>(x, y));
+                auto pos = Vector2<uint16_t>(x, y);
+                if(snakeMap->getTile(pos) == SnakeMapTile::Empty)
+                {
+                    emptyTilePoses.push_back(pos);
+                }
             }
         }
 
         int count = emptyTilePoses.size();
         if(count > 0)
         {
-            int nextFoodPosId = std::rand() % count;
+            int nextFoodPosId = random(count);
             snakeMap->addFood(emptyTilePoses[nextFoodPosId]);
         }
     }
