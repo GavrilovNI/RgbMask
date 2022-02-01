@@ -1,7 +1,6 @@
 #include "Snake.h"
 #include "SnakeMap.h"
 #include "SnakeMapUpdater.h"
-#include <Arduino.h>
 
 Vector2<int32_t> directionToVector2(Direction direction)
 {
@@ -32,7 +31,6 @@ Direction turnLeft(Direction direction)
 
 Snake::Snake(Vector2<int32_t> pos, Direction direction, int initialLength)
 {
-    Serial.println(pos.toString());
     auto directionVector = -directionToVector2(direction);
     for(int i = 0; i < initialLength; i++)
     {

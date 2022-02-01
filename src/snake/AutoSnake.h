@@ -2,7 +2,8 @@
 #include <memory>
 #include <vector>
 #include <list>
-#include <Arduino.h>
+#include <utility>
+#include <tuple>
 #include "SnakeMap.h"
 #include "Snake.h"
 
@@ -14,35 +15,24 @@ private:
 
     std::list<SnakeMapTile> getAllTilesFromHeadInDirection(Direction direction)
     {
-        //Serial.println("getAllTiles");
         std::list<SnakeMapTile> result;
         Bounds<int32_t> mapBounds(Vector2<int32_t>(0, 0), _snakeMap->getSize() - Vector2<int32_t>(1, 1));
         Vector2<int32_t> firstPos = _snake->getBody().front();
         Vector2<int32_t> directionVector = directionToVector2(direction);
 
-        //Serial.println((int)direction);
-        //Serial.println(directionVector.toString());
-        //Serial.println("getAllTiles2");
         Vector2<int32_t> pos = firstPos;
         while(mapBounds.isInside(pos))
         {
-        //Serial.println("getAllTiles3");
-        //Serial.println(pos.toString());
             result.push_back(_snakeMap->getTile(pos));
             pos = pos + directionVector;
         }
         pos = _snakeMap->normalizePos(pos);
-        //Serial.println("getAllTiles3.5");
-        //Serial.println(firstPos.toString());
         while(pos != firstPos)
         {
-        //Serial.println("getAllTiles4");
-        //Serial.println(pos.toString());
             result.push_back(_snakeMap->getTile(pos));
             pos = pos + directionVector;
         }
         
-        //Serial.println("getAllTiles5");
         result.pop_front();
         return result;
     }
@@ -78,71 +68,56 @@ public:
 
     void decide()
     {
-        //Serial.println("decide0");
         auto frontTiles = getAllTilesFromHeadInDirection(_snake->getDirection());
-        //Serial.println("decide1");
         auto rightTiles = getAllTilesFromHeadInDirection(turnRight(_snake->getDirection()));
-        //Serial.println("decide2");
         auto leftTiles = getAllTilesFromHeadInDirection(turnLeft(_snake->getDirection()));
-        //Serial.println("decide3");
 
-        bool needTurn = false;
+        bool canGoForward = frontTiles.size() != 0 && frontTiles.front() != SnakeMapTile::Snake && frontTiles.front() != SnakeMapTile::Wall;
+        bool canGoRight = rightTiles.size() != 0 && rightTiles.front() != SnakeMapTile::Snake && rightTiles.front() != SnakeMapTile::Wall;
+        bool canGoLeft = leftTiles.size() != 0 && leftTiles.front() != SnakeMapTile::Snake && leftTiles.front() != SnakeMapTile::Wall;
 
-        //Serial.println("decide");
-        //Serial.println(_snakeMap->getSize().toString());
-        //Serial.println(_snake->getBody().front().toString());
-
-        //Serial.println("frontTiles");
-        //for(auto tile : frontTiles)
-        //    Serial.print((int)tile);
-        //Serial.println();
-
-        //Serial.println("rightTiles");
-        //for(auto tile : rightTiles)
-        //    Serial.print((int)tile);
-        //Serial.println();
-
-        //Serial.println("leftTiles");
-        //for(auto tile : leftTiles)
-        //    Serial.print((int)tile);
-        //Serial.println();
-        if(frontTiles.size() != 0 && (frontTiles.front() == SnakeMapTile::Snake || frontTiles.front() == SnakeMapTile::Wall))
-        {
-            needTurn = true;
-            if(rightTiles.size() != 0 && (rightTiles.front() == SnakeMapTile::Snake || rightTiles.front() == SnakeMapTile::Wall))
-            {
-                _snake->turnLeft();
-                return;
-            }
-            else if(leftTiles.size() != 0 && (leftTiles.front() == SnakeMapTile::Snake || leftTiles.front() == SnakeMapTile::Wall))
-            {
-                _snake->turnRight();
-                return;
-            }
-        }
-
-        if(needTurn == false && hasTile(frontTiles, SnakeMapTile::Food))
-        {
-            return;
-        }
-
+        int distanceToFoodInFront = distanceToTile(frontTiles, SnakeMapTile::Food);
         int distanceToFoodInRight = distanceToTile(rightTiles, SnakeMapTile::Food);
-
-        if(needTurn == false && distanceToFoodInRight == -1)
-        {
-            return;
-        }
-
-        
         int distanceToFoodInLeft = distanceToTile(leftTiles, SnakeMapTile::Food);
 
-        if(distanceToFoodInRight < distanceToFoodInLeft)
+        typedef std::tuple<Direction, bool, int> Choise;
+        std::vector<Choise> choises;
+        choises.push_back(std::make_tuple(Direction::Up, canGoForward, distanceToFoodInFront));
+        choises.push_back(std::make_tuple(Direction::Right, canGoRight, distanceToFoodInRight));
+        choises.push_back(std::make_tuple(Direction::Left, canGoLeft, distanceToFoodInLeft));
+
+        std::sort(choises.begin(), choises.end(), [](Choise a, Choise b){
+            if(std::get<2>(a) == -1)
+            {
+                if(std::get<0>(a) == Direction::Up && std::get<2>(b) == -1)
+                    return true;
+                return false;
+            }
+                
+            if(std::get<2>(b) == -1)
+                return true;
+
+            return std::get<2>(a) < std::get<2>(b);
+        });
+
+        for(auto choise : choises)
         {
-            _snake->turnRight();
+            if(std::get<1>(choise))
+            {
+                switch (std::get<0>(choise))
+                {
+                case Direction::Right:
+                    _snake->turnRight();
+                    break;
+                case Direction::Left:
+                    _snake->turnLeft();
+                    break;
+                default:
+                    break;
+                }
+                break;
+            }
         }
-        else
-        {
-            _snake->turnLeft();
-        }
+
     }
 };
