@@ -1,49 +1,49 @@
 #include "SnakeMap.h"
 #include "Snake.h"
 
-SnakeMap::SnakeMap(Vector2<uint16_t> size)
+SnakeMap::SnakeMap(Vector2<int32_t> size)
 {
     _size = size;
 }
 
-Vector2<uint16_t> SnakeMap::normalizePos(Vector2<uint16_t> pos) const
+Vector2<int32_t> SnakeMap::normalizePos(Vector2<int32_t> pos) const
 {
-    pos.x = pos.x % _size.x;
-    pos.y = pos.y % _size.y;
+    pos.x = (pos.x + _size.x) % _size.x;
+    pos.y = (pos.y + _size.y) % _size.y;
     return pos;
 }
 
-void SnakeMap::addWall(Vector2<uint16_t> pos)
+void SnakeMap::addWall(Vector2<int32_t> pos)
 {
-    Vector2<uint16_t> normalized = normalizePos(pos);
+    Vector2<int32_t> normalized = normalizePos(pos);
     _walls.emplace(normalized);
 }
 
-void SnakeMap::removeWall(Vector2<uint16_t> pos)
+void SnakeMap::removeWall(Vector2<int32_t> pos)
 {
-    Vector2<uint16_t> normalized = normalizePos(pos);
+    Vector2<int32_t> normalized = normalizePos(pos);
     _walls.erase(normalized);
 }
 
-void SnakeMap::addWall(Bounds<uint16_t> wall)
+void SnakeMap::addWall(Bounds<int32_t> wall)
 {
     for(int y = wall.getDown(); y <= wall.getUp(); y++)
     {
         for(int x = wall.getLeft(); x <= wall.getRight(); x++)
         {
-            Vector2<uint16_t> normalized = normalizePos(Vector2<uint16_t>(x, y));
+            Vector2<int32_t> normalized = normalizePos(Vector2<int32_t>(x, y));
             _walls.emplace(normalized);
         }
     }
 }
 
-void SnakeMap::removeWall(Bounds<uint16_t> wall)
+void SnakeMap::removeWall(Bounds<int32_t> wall)
 {
     for(int y = wall.getDown(); y <= wall.getUp(); y++)
     {
         for(int x = wall.getLeft(); x <= wall.getRight(); x++)
         {
-            Vector2<uint16_t> normalized = normalizePos(Vector2<uint16_t>(x, y));
+            Vector2<int32_t> normalized = normalizePos(Vector2<int32_t>(x, y));
             _walls.erase(normalized);
         }
     }
@@ -59,24 +59,24 @@ void SnakeMap::removeSnake(std::shared_ptr<const Snake> snake)
     _snakes.erase(snake);
 }
 
-void SnakeMap::addFood(Vector2<uint16_t> pos)
+void SnakeMap::addFood(Vector2<int32_t> pos)
 {
-    Vector2<uint16_t> normalized = normalizePos(pos);
+    Vector2<int32_t> normalized = normalizePos(pos);
     _foods.emplace(normalized);
 }
 
-void SnakeMap::removeFood(Vector2<uint16_t> pos)
+void SnakeMap::removeFood(Vector2<int32_t> pos)
 {
-    Vector2<uint16_t> normalized = normalizePos(pos);
+    Vector2<int32_t> normalized = normalizePos(pos);
     _foods.erase(normalized);
 }
 
-bool SnakeMap::isWall(Vector2<uint16_t> pos) const
+bool SnakeMap::isWall(Vector2<int32_t> pos) const
 {
     pos = normalizePos(pos);
     return _walls.count(pos) == 1;
 }
-bool SnakeMap::isSnake(Vector2<uint16_t> pos) const
+bool SnakeMap::isSnake(Vector2<int32_t> pos) const
 {
     pos = normalizePos(pos);
     for(auto snake : _snakes)
@@ -87,13 +87,13 @@ bool SnakeMap::isSnake(Vector2<uint16_t> pos) const
     return false;
 }
 
-bool SnakeMap::isFood(Vector2<uint16_t> pos) const
+bool SnakeMap::isFood(Vector2<int32_t> pos) const
 {
     pos = normalizePos(pos);
     return _foods.count(pos) == 1;
 }
 
-SnakeMapTile SnakeMap::getTile(Vector2<uint16_t> pos) const
+SnakeMapTile SnakeMap::getTile(Vector2<int32_t> pos) const
 {
     if(isWall(pos))
         return SnakeMapTile::Wall;
@@ -104,7 +104,7 @@ SnakeMapTile SnakeMap::getTile(Vector2<uint16_t> pos) const
     return SnakeMapTile::Empty;
 }
 
-Vector2<uint16_t> SnakeMap::getSize() const
+Vector2<int32_t> SnakeMap::getSize() const
 {
     return _size;
 }

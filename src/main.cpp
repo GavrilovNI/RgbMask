@@ -117,16 +117,18 @@ std::shared_ptr<Colorer<LedMatrix>> colorer;
 
 void setup()
 {
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(32, 8), 16, NEO_GRB + NEO_KHZ800));
-  /*matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 19, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 5, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 21, NEO_GRB + NEO_KHZ800));
-  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(4, 13), 16, NEO_GRB + NEO_KHZ800));
-  */
+  //matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(16, 8), 16, NEO_GRB + NEO_KHZ800));
+  //matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(16, 8), 21, NEO_GRB + NEO_KHZ800));
+  
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 16, NEO_RGB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 5, NEO_RGB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(7, 13), 19, NEO_RGB + NEO_KHZ800));
+  matrixes.push_back(new AdafruitLedSnakeMatrix(Vector2<uint16_t>(4, 13), 21, NEO_RGB + NEO_KHZ800));
+  
   matrixSet = std::make_shared<LedMatrixSet>(container_cast(matrixes.strips), LedMatrixSet::Right);
 
-  snake = std::make_shared<Snake>(Vector2<uint16_t>(3, 3), Direction::Right, 3);
-  snakeMap = std::make_shared<SnakeMap>(matrixSet->getSize());
+  snake = std::make_shared<Snake>(Vector2<int32_t>(3, 3), Direction::Right, 3);
+  snakeMap = std::make_shared<SnakeMap>(Vector2<int32_t>(matrixSet->getSize()));
   snakeMap->addSnake(snake);
 
   snakeMapUpdater->spawnFood(snakeMap);
@@ -223,20 +225,26 @@ void loop()
   int snakeMoves = (int)floor(snakeTime / snakeStepTime);
   snakeTime -= snakeMoves * snakeStepTime;
 
+  //Serial.println("asd1");
   
   for(int i = 0; i < snakeMoves; i++)
   {
     if(snake->isDead() == false)
     {
+      //Serial.println("asd4");
       autoSnake->decide();
+      //Serial.println("asd5");
       snake->move(snakeMap, snakeMapUpdater);
+      //Serial.println("asd6");
     }
     else
     {
+      sleep(1000);
       ESP.restart();
     }
   }
 
+  //Serial.println("asd2");
   colorer->apply(mask);
   matrixes.show();
 
@@ -246,6 +254,7 @@ void loop()
 
   snakeTime += delta;
   
+  //Serial.println("asd3");
   //animation->moveTime(speed * delta / 1000);
   delay(10);
 }

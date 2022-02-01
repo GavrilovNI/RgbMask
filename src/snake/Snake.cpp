@@ -3,18 +3,18 @@
 #include "SnakeMapUpdater.h"
 #include <Arduino.h>
 
-Vector2<uint16_t> directionToVector2(Direction direction)
+Vector2<int32_t> directionToVector2(Direction direction)
 {
     switch (direction)
     {
     case Direction::Up:
-        return Vector2<uint16_t>(0, 1);
+        return Vector2<int32_t>(0, 1);
     case Direction::Right:
-        return Vector2<uint16_t>(1, 0);
+        return Vector2<int32_t>(1, 0);
     case Direction::Down:
-        return Vector2<uint16_t>(0, -1);
+        return Vector2<int32_t>(0, -1);
     case Direction::Left:
-        return Vector2<uint16_t>(-1, 0);
+        return Vector2<int32_t>(-1, 0);
     default:
         throw "not implemented";
     }
@@ -30,8 +30,9 @@ Direction turnLeft(Direction direction)
     return (Direction)(((int)direction - 1 + (int)Direction::Count) % ((int)Direction::Count));
 }
 
-Snake::Snake(Vector2<uint16_t> pos, Direction direction, int initialLength)
+Snake::Snake(Vector2<int32_t> pos, Direction direction, int initialLength)
 {
+    Serial.println(pos.toString());
     auto directionVector = -directionToVector2(direction);
     for(int i = 0; i < initialLength; i++)
     {
@@ -86,9 +87,9 @@ void Snake::turnLeft()
     _direction = ::turnLeft(_direction);
 }
 
-bool Snake::isBody(Vector2<uint16_t> pos) const
+bool Snake::isBody(Vector2<int32_t> pos) const
 {
-    for(Vector2<uint16_t> bodyPos : _body)
+    for(Vector2<int32_t> bodyPos : _body)
     {
         if(bodyPos == pos)
             return true;
@@ -101,7 +102,7 @@ bool Snake::isDead() const
     return _died;
 }
 
-const std::list<Vector2<uint16_t>>& Snake::getBody() const
+const std::list<Vector2<int32_t>>& Snake::getBody() const
 {
     return _body;
 }

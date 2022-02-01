@@ -26,6 +26,13 @@ public:
         this->y = other.y;
     }
 
+    template <typename Y>
+    Vector2(const Vector2<Y>& other)
+    {
+        this->x = (T)other.x;
+        this->y = (T)other.y;
+    }
+
     Vector2<T> operator+(const Vector2<T>& other) const
     {
         return Vector2(x + other.x, y + other.y);

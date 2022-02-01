@@ -12,7 +12,7 @@ enum class Direction
     Count
 };
 
-Vector2<uint16_t> directionToVector2(Direction direction);
+Vector2<int32_t> directionToVector2(Direction direction);
 Direction turnRight(Direction direction);
 Direction turnLeft(Direction direction);
 
@@ -22,13 +22,13 @@ class SnakeMapUpdater;
 class Snake : public std::enable_shared_from_this<Snake>
 {
 private:
-    std::list<Vector2<uint16_t>> _body;
+    std::list<Vector2<int32_t>> _body;
     Direction _direction;
     bool _died;
     
 public:
 
-    Snake(Vector2<uint16_t> pos, Direction direction, int initialLength);
+    Snake(Vector2<int32_t> pos, Direction direction, int initialLength);
 
     void move(std::shared_ptr<SnakeMap> snakeMap, std::shared_ptr<SnakeMapUpdater> snakeMapUpdater);
 
@@ -36,11 +36,11 @@ public:
 
     void turnLeft();
 
-    bool isBody(Vector2<uint16_t> pos) const;
+    bool isBody(Vector2<int32_t> pos) const;
 
     bool isDead() const;
 
-    const std::list<Vector2<uint16_t>>& getBody() const;
+    const std::list<Vector2<int32_t>>& getBody() const;
 
     Direction getDirection() const;
 };

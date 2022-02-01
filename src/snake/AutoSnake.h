@@ -14,24 +14,35 @@ private:
 
     std::list<SnakeMapTile> getAllTilesFromHeadInDirection(Direction direction)
     {
+        //Serial.println("getAllTiles");
         std::list<SnakeMapTile> result;
-        Bounds<uint16_t> mapBounds(Vector2<uint16_t>(0, 0), _snakeMap->getSize() - Vector2<uint16_t>(1, 1));
-        Vector2<uint16_t> firstPos = _snake->getBody().front();
-        Vector2<uint16_t> directionVector = directionToVector2(direction);
+        Bounds<int32_t> mapBounds(Vector2<int32_t>(0, 0), _snakeMap->getSize() - Vector2<int32_t>(1, 1));
+        Vector2<int32_t> firstPos = _snake->getBody().front();
+        Vector2<int32_t> directionVector = directionToVector2(direction);
 
-        Vector2<uint16_t> pos = firstPos;
+        //Serial.println((int)direction);
+        //Serial.println(directionVector.toString());
+        //Serial.println("getAllTiles2");
+        Vector2<int32_t> pos = firstPos;
         while(mapBounds.isInside(pos))
         {
+        //Serial.println("getAllTiles3");
+        //Serial.println(pos.toString());
             result.push_back(_snakeMap->getTile(pos));
             pos = pos + directionVector;
         }
         pos = _snakeMap->normalizePos(pos);
+        //Serial.println("getAllTiles3.5");
+        //Serial.println(firstPos.toString());
         while(pos != firstPos)
         {
+        //Serial.println("getAllTiles4");
+        //Serial.println(pos.toString());
             result.push_back(_snakeMap->getTile(pos));
             pos = pos + directionVector;
         }
         
+        //Serial.println("getAllTiles5");
         result.pop_front();
         return result;
     }
@@ -67,12 +78,34 @@ public:
 
     void decide()
     {
+        //Serial.println("decide0");
         auto frontTiles = getAllTilesFromHeadInDirection(_snake->getDirection());
+        //Serial.println("decide1");
         auto rightTiles = getAllTilesFromHeadInDirection(turnRight(_snake->getDirection()));
+        //Serial.println("decide2");
         auto leftTiles = getAllTilesFromHeadInDirection(turnLeft(_snake->getDirection()));
+        //Serial.println("decide3");
 
         bool needTurn = false;
 
+        //Serial.println("decide");
+        //Serial.println(_snakeMap->getSize().toString());
+        //Serial.println(_snake->getBody().front().toString());
+
+        //Serial.println("frontTiles");
+        //for(auto tile : frontTiles)
+        //    Serial.print((int)tile);
+        //Serial.println();
+
+        //Serial.println("rightTiles");
+        //for(auto tile : rightTiles)
+        //    Serial.print((int)tile);
+        //Serial.println();
+
+        //Serial.println("leftTiles");
+        //for(auto tile : leftTiles)
+        //    Serial.print((int)tile);
+        //Serial.println();
         if(frontTiles.size() != 0 && (frontTiles.front() == SnakeMapTile::Snake || frontTiles.front() == SnakeMapTile::Wall))
         {
             needTurn = true;
