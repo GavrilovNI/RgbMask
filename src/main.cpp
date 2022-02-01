@@ -239,7 +239,7 @@ void loop()
     }
     else
     {
-      sleep(1000);
+      delay(1000);
       ESP.restart();
     }
   }
