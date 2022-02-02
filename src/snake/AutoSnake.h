@@ -3,6 +3,7 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <algorithm>
 #include <tuple>
 #include "SnakeMap.h"
 #include "Snake.h"
@@ -66,6 +67,11 @@ public:
         _snakeMap = snakeMap;
     }
 
+    std::shared_ptr<Snake> getSnake()
+    {
+        return _snake;
+    }
+
     void decide()
     {
         auto frontTiles = getAllTilesFromHeadInDirection(_snake->getDirection());
@@ -100,21 +106,28 @@ public:
             return std::get<2>(a) < std::get<2>(b);
         });
 
-        for(auto choise : choises)
+        choises.erase(std::remove_if(choises.begin(), choises.end(), [](Choise choise){ return std::get<1>(choise) == false;}), choises.end());
+
+        if(choises.size() > 0)
         {
-            if(std::get<1>(choise))
+            Choise choise = choises.front();
+            if(std::get<2>(choise) == -1) // if food not found
             {
-                switch (std::get<0>(choise))
+                if(std::get<0>(choise) != Direction::Up) // if we cant go forward
                 {
-                case Direction::Right:
-                    _snake->turnRight();
-                    break;
-                case Direction::Left:
-                    _snake->turnLeft();
-                    break;
-                default:
-                    break;
+                    choise = choises[random(choises.size())]; // choose random direction
                 }
+            }
+
+            switch (std::get<0>(choise))
+            {
+            case Direction::Right:
+                _snake->turnRight();
+                break;
+            case Direction::Left:
+                _snake->turnLeft();
+                break;
+            default:
                 break;
             }
         }

@@ -2,6 +2,8 @@
 #include "SnakeMap.h"
 #include "SnakeMapUpdater.h"
 
+int snid = 0;
+
 Vector2<int32_t> directionToVector2(Direction direction)
 {
     switch (direction)
@@ -38,6 +40,8 @@ Snake::Snake(Vector2<int32_t> pos, Direction direction, int initialLength)
     }
     _direction = direction;
     _died = false;
+
+    _snakeId = snid++;
 }
 
 void Snake::move(std::shared_ptr<SnakeMap> snakeMap, std::shared_ptr<SnakeMapUpdater> snakeMapUpdater)

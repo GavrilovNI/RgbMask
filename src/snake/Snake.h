@@ -26,7 +26,9 @@ private:
     Direction _direction;
     bool _died;
     
+
 public:
+    int _snakeId;
 
     Snake(Vector2<int32_t> pos, Direction direction, int initialLength);
 
