@@ -13,6 +13,7 @@
 
 #include "tests/AnimationTest.h"
 #include "tests/SnakeTest.h"
+#include "tests/GameLifeTest.h"
 
 auto ledStrips = std::make_shared<AdafruitLedStripContainer<AdafruitLedSnakeMatrix>>();
 std::shared_ptr<LedMatrixSet> matrixSet;
@@ -31,7 +32,8 @@ void setup()
     matrixSet = std::make_shared<LedMatrixSet>(container_cast(ledStrips->strips), LedMatrixSet::Right);
 
     //test = std::make_shared<AnimationTest>(ledStrips, matrixSet, std::make_shared<Rainbow45>(20));
-    test = std::make_shared<SnakeTest>(ledStrips, matrixSet);
+    //test = std::make_shared<SnakeTest>(ledStrips, matrixSet);
+    test = std::make_shared<GameLifeTest>(ledStrips, matrixSet);
 
     ledStrips->begin();
     ledStrips->clear();

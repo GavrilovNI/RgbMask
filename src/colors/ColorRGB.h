@@ -21,5 +21,8 @@ public:
     std::vector<uint8_t> toBytes() const;
     
     String toString() const;
+
+    bool operator==(const ColorRGB& value) const;
+    bool operator!=(const ColorRGB& value) const;
 };
 

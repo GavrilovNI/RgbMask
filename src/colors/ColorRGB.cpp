@@ -67,3 +67,12 @@ String ColorRGB::toString() const
 
     return String("ColorRGB(" + strR + ";" + strG + ";" + strB + ")");
 }
+
+bool ColorRGB::operator==(const ColorRGB& value) const
+{
+    return r == value.r && g == value.g && b == value.b;
+}
+bool ColorRGB::operator!=(const ColorRGB& value) const
+{
+    return r != value.r || g != value.g || b != value.b;
+}
